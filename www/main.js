@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
         scene.add(new THREE.AmbientLight(0x212223));
 
         // Cube
-        var geometry_cube = new THREE.CubeGeometry(200, 200, 200);
+        var geometry_cube = new THREE.BoxGeometry(200, 200, 200);
 
         var texture = THREE.ImageUtils.loadTexture('textures/crosswalk.png'); //Works on mobile Android NOT in Browser or Intel XDK
         texture.anisotropy = renderer.getMaxAnisotropy();
@@ -98,8 +98,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         if (navigator.fusion) {
             console.log('SensorFusion available.');
-            navigator.fusion.watchSensorFusion(function (quat) {
-                cube.quaternion.set(quat.x, quat.y, quat.z, quat.w);
+            navigator.fusion.watchSensorFusion(function (result) {
+                cube.quaternion.set(result.quaternion.x, result.quaternion.y, result.quaternion.z, result.quaternion.w);
             }, function (err) {
                 console.log('error', err);
             }, {
