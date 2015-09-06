@@ -1,7 +1,12 @@
+[![npm version](https://badge.fury.io/js/cordova-plugin-device-sensor-fusion.svg)](http://badge.fury.io/js/cordova-plugin-device-sensor-fusion)
+
 # cordova-plugin-device-sensor-fusion
 
 A cordova plugin using sensor fusion to offer more precise orientation data.
 It is based on a work of Alexander Pacha (https://bitbucket.org/apacha/sensor-fusion-demo).
+
+DEMO:
+https://github.com/adirtyshame/threecordova
 
 Access is via a global `navigator.fusion` object.
 
@@ -28,6 +33,34 @@ Install via cordova CLI:
 - navigator.fusion.getCurrentSensorFusion
 - navigator.fusion.watchSensorFusion
 - navigator.fusion.clearWatch
+
+### navigator.fusion.setMode
+
+Set the operation-mode for the plugin. 
+
+    navigator.fusion.setMode(success, err, mode);
+
+Available modes are (from '0' to '5'):
+
+- __0__: Improved Orientation Sensor 1 (Sensor fusion of Android Rotation Vector and Calibrated Gyroscope - less stable but more accurate)
+- __1__: Improved Orientation Sensor 2 (Sensor fusion of Android Rotation Vector and Calibrated Gyroscope - more stable but less accurate)
+- __2__: Android Rotation Vector (Kalman filter fusion of Accelerometer + Gyroscope + Compass)
+- __3__: Calibrated Gyroscope (Separate result of Kalman filter fusion of Accelerometer + Gyroscope + Compass)
+- __4__: Gravity + Compass
+- __5__: Accelerometer + Compass
+
+#### Example
+
+    function success(result) {
+        alert('new Mode: ' + result);
+    };
+
+    function err(error) {
+        alert('Error: ' + error);
+    };
+    
+    // Set operation mode to 'Android Rotation Vector'
+    navigator.fusion.setMode(onSuccess, onError, 2);
 
 ### navigator.fusion.getCurrentSensorFusion
 
@@ -64,60 +97,70 @@ ID can be used with `navigator.fusion.clearWatch` to stop watching the navigator
 
 #### Example
 
-    function onSuccess(heading) {
-        var element = document.getElementById('heading');
-        element.innerHTML = 'Heading: ' + heading.magneticHeading;
+    function onSuccess(result) {
+        var element = document.getElementById('result');
+        element.innerHTML = 'Result.x: ' + result.x;
     };
 
-    function onError(compassError) {
-        alert('Compass error: ' + compassError.code);
+    function onError(fusionError) {
+        alert('Fusion error: ' + fusionError.code);
     };
 
     var options = {
         frequency: 3000
     }; // Update every 3 seconds
 
-    var watchID = navigator.compass.watchHeading(onSuccess, onError, options);
+    var watchID = navigator.fusion.watchSensorFusion(onSuccess, onError, options);
     
-## navigator.compass.clearWatch
+## navigator.fusion.clearWatch
 
-Stop watching the compass referenced by the watch ID parameter.
+Stop watching the sensor fusion referenced by the watch ID parameter.
 
-    navigator.compass.clearWatch(watchID);
+    navigator.fusion.clearWatch(watchID);
 
-- __watchID__: The ID returned by `navigator.compass.watchHeading`.
+- __watchID__: The ID returned by `navigator.fusion.watchSensorFusion`.
 
 ### Example
 
-    var watchID = navigator.compass.watchHeading(onSuccess, onError, options);
+    var watchID = navigator.fusion.watchSensorFusion(onSuccess, onError, options);
 
     // ... later on ...
 
-    navigator.compass.clearWatch(watchID);
+    navigator.fusion.clearWatch(watchID);
 
-## CompassHeading
+## FusionResult
 
-A `CompassHeading` object is returned to the `compassSuccess` callback function.
-
-### Properties
-
-- __magneticHeading__: The heading in degrees from 0-359.99 at a single moment in time. _(Number)_
-
-- __trueHeading__: The heading relative to the geographic North Pole in degrees 0-359.99 at a single moment in time. A negative value indicates that the true heading can't be determined.  _(Number)_
-
-- __headingAccuracy__: The deviation in degrees between the reported heading and the true heading. _(Number)_
-
-- __timestamp__: The time at which this heading was determined.  _(milliseconds)_
-
-## CompassError
-
-A `CompassError` object is returned to the `compassError` callback function when an error occurs.
+A `FusionResult` object is returned to the `fusionSuccess` callback function.
 
 ### Properties
 
-- __code__: One of the predefined error codes listed below.
+- __FusionResult.__ (ATTENTION: will be deprecated soon)
 
-### Constants
+  * __x__: The x-component of the resulting quaternion. _(Number)_
+  * __y__: The y-component of the resulting quaternion. _(Number)_
+  * __z__: The z-component of the resulting quaternion. _(Number)_
+  * __w__: The w-component of the resulting quaternion. _(Number)_
 
-- `CompassError.COMPASS_INTERNAL_ERR`
-- `CompassError.COMPASS_NOT_SUPPORTED`
+- __FusionResult.quaternion.__
+
+  * __x__: The x-component of the resulting quaternion. _(Number)_
+  * __y__: The y-component of the resulting quaternion. _(Number)_
+  * __z__: The z-component of the resulting quaternion. _(Number)_
+  * __w__: The w-component of the resulting quaternion. _(Number)_
+
+- __FusionResult.eulerAngles.__
+
+  * __yaw__: The Euler-Angles yaw component. _(Number)_
+  * __pitch__: The Euler-Angles pitch component. _(Number)_
+  * __roll__: The Euler-Angles roll component. _(Number)_
+
+- __FusionResult.timestamp__: The time at which the data was determined.  _(milliseconds)_
+
+### Changelog
+
+- __0.0.1__
+  * initial commit
+- __0.0.2__
+  * README.md updated
+- __0.0.3__
+  * FusionResult extended (see 'Properties') !!!ATTENTION: DEPRECATION!!!

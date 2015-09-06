@@ -17,9 +17,8 @@
     },
     "cordova-plugin-device-sensor-fusion": {
         "source": {
-            "type": "git",
-            "url": "https://github.com/adirtyshame/cordova-plugin-device-sensor-fusion.git",
-            "subdir": "."
+            "type": "registry",
+            "id": "cordova-plugin-device-sensor-fusion"
         },
         "is_top_level": true,
         "variables": {}
